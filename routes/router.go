@@ -1,6 +1,7 @@
 package routes
 
 import (
+	"ddrag23/gae-soal/features/auth"
 	"ddrag23/gae-soal/features/user"
 	"ddrag23/gae-soal/middleware"
 
@@ -13,6 +14,7 @@ func InitRouter(app *fiber.App)  {
 	// 	return c.SendString("Hello Word")
 	// })
 	api := app.Group("/api",logger.New())
+	api.Post("/login",auth.Login)
 	api.Get("/", user.Index)
 
 
