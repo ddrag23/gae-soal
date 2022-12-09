@@ -9,21 +9,23 @@ import (
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
+
 var DB *gorm.DB
-func ConnectDB(){
+
+func ConnectDB() {
 	var err error
 	p := config.Config("DB_PORT")
 	port, err := strconv.ParseUint(p, 10, 32)
-	dsn := fmt.Sprintf("host=%s user=%s dbname=%s port=%d sslmode=disable TimeZone=Asia/Jakarta",config.Config("DB_HOST"), config.Config("DB_USERNAME"), config.Config("DB_NAME"),port)
-	DB,err = gorm.Open(postgres.New(postgres.Config{
-		DSN: dsn, // data source name, refer https://github.com/jackc/pgx
+	dsn := fmt.Sprintf("host=%s user=%s dbname=%s port=%d sslmode=disable TimeZone=Asia/Jakarta", config.Config("DB_HOST"), config.Config("DB_USERNAME"), config.Config("DB_NAME"), port)
+	DB, err = gorm.Open(postgres.New(postgres.Config{
+		DSN:                  dsn,  // data source name, refer https://github.com/jackc/pgx
 		PreferSimpleProtocol: true, // disables implicit prepared statement usage. By default pgx automatically uses the extended protocol
-	  }), &gorm.Config{})
+	}), &gorm.Config{})
 	if err != nil {
 		panic(err)
 	}
 
 	fmt.Println("Connection Opened to Database")
-	DB.AutoMigrate(&model.User{},&model.Role{})
+	DB.AutoMigrate(&model.User{}, &model.Role{}, &model.Soal{}, &model.Jawaban{})
 	fmt.Println("Database Migrated")
 }

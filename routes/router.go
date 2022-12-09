@@ -2,6 +2,7 @@ package routes
 
 import (
 	"ddrag23/gae-soal/features/auth"
+	"ddrag23/gae-soal/features/soal"
 	"ddrag23/gae-soal/features/user"
 	"ddrag23/gae-soal/middleware"
 
@@ -20,6 +21,12 @@ func InitRouter(app *fiber.App) {
 	})
 	api.Post("/register", user.Store)
 	api.Use(middleware.Protected())
+
+	// guru route
+	soalRoute := api.Group("soal")
+	soalRoute.Get("/", soal.Index)
+	soalRoute.Post("/", soal.Store)
+	// admin route
 	api.Use(middleware.RoleAccess())
 	userRoute := api.Group("/user")
 	userRoute.Get("/", user.Index)
