@@ -85,8 +85,7 @@ func ChangePassword(c *fiber.Ctx) error {
 	if !utils.CheckPasswordHash(c.FormValue("old_password"), user.Password) {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"status": "error", "message": "Invalid old password", "data": nil})
 	}
-
-	hash, err := utils.HashPassword(request.NewPassword)
+	hash, err := utils.HashPassword(c.FormValue("new_password"))
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"status": "error", "message": "Couldn't hash password", "data": err})
 	}

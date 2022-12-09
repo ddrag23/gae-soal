@@ -19,8 +19,9 @@ func InitRouter(app *fiber.App) {
 		return c.SendString("Welcome to gae soal")
 	})
 	api.Post("/register", user.Store)
-
-	userRoute := api.Group("/user", middleware.Protected())
+	api.Use(middleware.Protected())
+	api.Use(middleware.RoleAccess())
+	userRoute := api.Group("/user")
 	userRoute.Get("/", user.Index)
 	userRoute.Post("/", user.Store)
 	userRoute.Put("/:id", user.Updated)

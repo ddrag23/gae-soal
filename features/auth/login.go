@@ -12,11 +12,10 @@ import (
 	"github.com/golang-jwt/jwt/v4"
 )
 
-
-func getByUsername(username string) (*model.User,error) {
+func getByUsername(username string) (*model.User, error) {
 	db := database.DB
 	var user model.User
-	if err := db.Where("username = ?",username).First(&user).Error; err != nil {
+	if err := db.Preload("Role").Where("username = ?", username).First(&user).Error; err != nil {
 		// if errors.Is(err, gorm.ErrRecordNotFound) {
 		// 	return nil, nil
 		// }
@@ -29,21 +28,21 @@ func Login(c *fiber.Ctx) error {
 	if err := c.BodyParser(request); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"status": "error", "message": "Error on login request", "data": err})
 	}
-	var ud user.ResponseUser 
-	queryUser,err := getByUsername(request.Username)
+	var ud user.ResponseUser
+	queryUser, err := getByUsername(request.Username)
 	if err != nil {
 		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"status": "error", "message": "Error on username", "data": err.Error()})
 	}
 	if queryUser != nil {
 		ud = user.ResponseUser{
-			ID: queryUser.ID,
+			ID:       queryUser.ID,
 			Username: queryUser.Username,
-			Email: queryUser.Email,
-			Name: queryUser.Name,
-			Role: queryUser.Role,
+			Email:    queryUser.Email,
+			Name:     queryUser.Name,
+			Role:     queryUser.Role,
 		}
 	}
-	if !utils.CheckPasswordHash(request.Password,queryUser.Password) {
+	if !utils.CheckPasswordHash(request.Password, queryUser.Password) {
 		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"status": "error", "message": "Invalid password", "data": nil})
 	}
 
@@ -52,6 +51,8 @@ func Login(c *fiber.Ctx) error {
 	claims := token.Claims.(jwt.MapClaims)
 	claims["username"] = ud.Username
 	claims["user_id"] = ud.ID
+	claims["role_id"] = ud.ID
+	claims["role_name"] = ud.Role.Name
 	claims["exp"] = time.Now().Add(time.Hour * 72).Unix()
 
 	t, err := token.SignedString([]byte(config.Config("SECRET")))
