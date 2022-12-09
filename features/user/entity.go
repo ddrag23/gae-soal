@@ -1,15 +1,23 @@
 package user
 
-type RequestUser struct{
-	Username string `json:"username"`
-	Name string `json:"name"`
-	Password string `json:"password"`
-	Email string `json:"email"`
-	RoleId string `json:"role_id"`
+import "ddrag23/gae-soal/model"
+
+type ResponseUser struct {
+	ID       uint       `json:"id"`
+	Username string     `json:"username"`
+	Name     string     `json:"name"`
+	Email    string     `json:"email"`
+	Role     model.Role `json:"role"`
 }
-type ResponseUser struct{
-	ID uint `json:"id"`
+
+type UpdateUser struct {
 	Username string `json:"username"`
-	Name string `json:"name"`
-	Email string `json:"email"`
+	Name     string `json:"name"`
+	Email    string `json:"email"`
+	RoleId   uint   `json:"role_id"`
+}
+
+type ChangePasswordUser struct {
+	OldPassword string `json:"old_password"`
+	NewPassword string `json:"new_password"`
 }

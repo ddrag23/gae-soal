@@ -9,5 +9,6 @@ type User struct{
 	Email string `gorm:"unique_index;not null" json:"email"`
 	Name string `gorm:"unique_index;not null" json:"name"`
 	Password string `gorm:"not null" json:"password"`
-	RoleId string `gorm:"not null" json:"role_id"`
+	RoleId uint `gorm:"not null" json:"role_id"`
+	Role Role `json:"role"`
 }

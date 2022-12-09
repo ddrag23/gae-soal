@@ -6,23 +6,20 @@ import (
 	"ddrag23/gae-soal/features/user"
 	"ddrag23/gae-soal/model"
 	"ddrag23/gae-soal/utils"
-	"errors"
-	"log"
 	"time"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/golang-jwt/jwt/v4"
-	"gorm.io/gorm"
 )
 
 
 func getByUsername(username string) (*model.User,error) {
 	db := database.DB
 	var user model.User
-	if err := db.Where("username = ?",username).Find(&user).Error; err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return nil, nil
-		}
+	if err := db.Where("username = ?",username).First(&user).Error; err != nil {
+		// if errors.Is(err, gorm.ErrRecordNotFound) {
+		// 	return nil, nil
+		// }
 		return nil, err
 	}
 	return &user, nil
@@ -34,9 +31,8 @@ func Login(c *fiber.Ctx) error {
 	}
 	var ud user.ResponseUser 
 	queryUser,err := getByUsername(request.Username)
-	log.Println(queryUser)
 	if err != nil {
-		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"status": "error", "message": "Error on username", "data": err})
+		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"status": "error", "message": "Error on username", "data": err.Error()})
 	}
 	if queryUser != nil {
 		ud = user.ResponseUser{
@@ -44,6 +40,7 @@ func Login(c *fiber.Ctx) error {
 			Username: queryUser.Username,
 			Email: queryUser.Email,
 			Name: queryUser.Name,
+			Role: queryUser.Role,
 		}
 	}
 	if !utils.CheckPasswordHash(request.Password,queryUser.Password) {
